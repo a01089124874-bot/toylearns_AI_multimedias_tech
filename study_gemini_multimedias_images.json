@@ -1,0 +1,455 @@
+{
+  "name": "study_gemini_multimedias_images",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "프롬프트 경과받기 ",
+        "formDescription": "전심사진 넣으면 증명사징 생성 ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "input image",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -544,
+        -32
+      ],
+      "id": "fbf3085c-0fb8-421d-a174-3ceb53a508b5",
+      "name": "On form submission",
+      "webhookId": "6aa9d7f5-b40f-441c-aadf-14e28a3fac22"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyCs_dv0zAdVbWAQNYkgn-9zA1zzHoAsADs"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [\n      {\n        \"text\": \"이미지 속의 인물 전심사진을 증명사진으로 생성해줘\"\n      },\n      {\n        \"inline_data\": {\n          \"mime_type\": \"{{ $('On form submission').item.json['input image'][0].mimetype }}\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -96,
+        -32
+      ],
+      "id": "27fd7204-c6bb-4800-8228-48cee5fad406",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[1].inlineData.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "59dfd49e-5954-467b-ab54-222e23e0cdec",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "input_image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -32
+      ],
+      "id": "76f2f38f-82e5-41f2-95a3-f0d40f972958",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyCs_dv0zAdVbWAQNYkgn-9zA1zzHoAsADs"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"contents\": [\n      {\n        \"parts\": [\n          {\n            \"text\": \"{{ $json['input image'] }}\"\n          }\n        ]\n      }\n    ]\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -304,
+        -368
+      ],
+      "id": "d01ade3c-ba73-4e6d-adca-39905a381831",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyCs_dv0zAdVbWAQNYkgn-9zA1zzHoAsADs"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"{{ $json['input text'] }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -288,
+        -208
+      ],
+      "id": "039708c2-c031-4dad-a966-a5292a83bffb",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[1].inlineData.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -112,
+        -208
+      ],
+      "id": "464be38a-3dd1-44c3-ba4b-c82f3bc8a342",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "formTitle": "프롬프트 경과받기 ",
+        "formDescription": "전심사진 넣으면 증명사징 생성 ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "input image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -528,
+        -368
+      ],
+      "id": "2dd3aea5-0fd2-4948-afe9-411e8e42dee4",
+      "name": "On form submission1",
+      "webhookId": "52f042a6-5809-48b8-ad46-255563a3e459"
+    },
+    {
+      "parameters": {
+        "formTitle": "이미지 생송",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "input text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -528,
+        -208
+      ],
+      "id": "928fb8f7-5fa6-4004-85aa-e836848c467b",
+      "name": "On form submission2",
+      "webhookId": "ab6efa31-2f76-4e1a-8687-420d37fe18aa"
+    },
+    {
+      "parameters": {
+        "formTitle": "프롬프트 경과받기 ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "input image",
+              "fieldType": "file"
+            },
+            {
+              "fieldLabel": "프롬프트"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -560,
+        192
+      ],
+      "id": "c7df264d-1fff-4737-89cc-a8b4b9d60206",
+      "name": "On form submission3",
+      "webhookId": "5086a345-b27a-419a-a2dc-0656b1dcb6d5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyCs_dv0zAdVbWAQNYkgn-9zA1zzHoAsADs"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [\n      {\n        \"text\": \"{{ $('On form submission3').item.json['프롬프트'] }}\"\n      },\n      {\n        \"inline_data\": {\n          \"mime_type\": \"{{ $('On form submission3').item.json['input image'][0].mimetype }}\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -112,
+        192
+      ],
+      "id": "661ea7b7-8064-4d81-9b36-fcf3cb4e98ab",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[1].inlineData.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        192
+      ],
+      "id": "7fb85d24-37e1-403d-9c78-3e2fd2056a05",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "input_image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        192
+      ],
+      "id": "20ef0548-008b-4e65-a01a-b5226b4558c0",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1LhLjAsHTkqtu1e4cyfB63o39_247wI7n",
+          "mode": "list",
+          "cachedResultName": "강아지에서 호랑이로 ",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1LhLjAsHTkqtu1e4cyfB63o39_247wI7n"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        304,
+        192
+      ],
+      "id": "c84bef5f-d93d-4b1e-8d19-620eeffe7267",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "umEjSxLMiwvdEmW6",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission3": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dd895cdb-99c8-4cf9-ac0a-9f5040d80bd6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1416ee2194e59d65f2caf7e48db1c0c89b647d599fb6985cbde138e15ffc28f7"
+  },
+  "id": "sQPIMP0WBxxWF2Iw",
+  "tags": []
+}
